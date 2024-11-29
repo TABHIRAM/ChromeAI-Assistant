@@ -51,7 +51,7 @@ This project offers an offline AI assistant using Chrome's Built-in AI APIs and 
    - If this fails, first **try running Chrome as an administrator** and then test again.
    - If the issue persists, refer to this troubleshooting guide for further assistance: [Built-in AI Early Preview Program](https://docs.google.com/document/d/1VG8HIyz361zGduWgNG7R_R8Xkv0OOJ8b5C9QKeCjU0c/edit?tab=t.0)
 
-## Tested on:
+## Tested on
 - **Chrome Dev Version**: 133.0.6847.2 (Official Build, 64-bit, cohort: Dev)
 
 ## Features
