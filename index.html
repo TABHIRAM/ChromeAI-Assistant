@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Workspace Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #6d28d9;
+      --secondary: #1f2937;
+      --surface: #ffffff;
+      --background: #f8fafc;
+      --error: #ef4444;
+      --success: #22c55e;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --glass: rgba(255, 255, 255, 0.9);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #0f172a;
+      color: var(--secondary);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    #particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 620px 1fr;
+      min-height: 100vh;
+    }
+
+    .header {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 2rem;
+      color: white;
+      background: rgba(15, 23, 42, 0.8);
+      
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header p {
+      opacity: 0.9;
+    }
+
+    .input-panel {
+     
+      backdrop-filter: blur(10px);
+      padding: 2rem;
+      position: sticky;
+      top: 0;
+      height: calc(200vh - 100px);
+      overflow-y: auto;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .output-panel {
+      padding: 2rem;
+      background: rgba(15, 23, 42, 0.95);
+      min-height: calc(180vh - 100px);
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-icon {
+      padding: 0.5rem;
+      border-radius: 50%;
+      aspect-ratio: 1;
+    }
+
+    .chat-input {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1rem;
+      resize: vertical;
+      transition: all 0.2s;
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .input-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .output-content {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1.5rem;
+      border-radius: 12px;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      min-height: 200px;
+      white-space: pre-wrap;
+      margin-bottom: 1rem;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .status {
+      padding: 0.5rem;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      color: white;
+    }
+
+    .status.error {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .status.success {
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    /* .shortcuts {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: white;
+      display: flex;
+      gap: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 10;
+    } */
+
+    .shortcuts {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: white;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr); /* Default: 1 column */
+  gap: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 10;
+}
+
+@media (max-width: 767px) {
+  .shortcuts {
+    grid-template-columns: repeat(3, 1fr); /* 2 columns for medium screens */
+  }
+}
+
+@media (min-width: 768px) {
+  .shortcuts {
+    grid-template-columns: repeat(3, 1fr); /* 3 columns for large screens */
+  }
+}
+
+@media (min-width: 1024px) {
+  .shortcuts {
+    grid-template-columns: repeat(5, 1fr); /* 4 columns for extra-large screens */
+  }
+}
+
+@media (min-width: 1200px) {
+  .shortcuts {
+    grid-template-columns: repeat(10, 1fr); /* 5 columns for very large screens */
+  }
+}
+
+    .shortcut {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .key {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: monospace;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .recording-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--error);
+      font-weight: 500;
+      animation: pulse 1.5s infinite;
+    }
+
+    .loader {
+      display: none;
+      padding: 1rem;
+      text-align: center;
+      color: white;
+    }
+
+    .loader.visible {
+      display: block;
+    }
+
+    .typing {
+      position: relative;
+      width: 6rem;
+      height: 2rem;
+      margin: 0 auto;
+    }
+
+    .typing span {
+      position: absolute;
+      top: 0;
+      width: 0.5rem;
+      height: 0.5rem;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: typing 1s infinite;
+    }
+
+    .typing span:nth-child(1) { left: 0; animation-delay: 0.2s; }
+    .typing span:nth-child(2) { left: 2rem; animation-delay: 0.4s; }
+    .typing span:nth-child(3) { left: 4rem; animation-delay: 0.6s; }
+
+    @keyframes typing {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(1rem); }
+      100% { transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+      
+      .input-panel {
+        position: relative;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+  
+  <div class="container">
+    <header class="header">
+        <h1>Chrome Built-in AI Workspace</h1>
+        <p>Powered by Chrome's Built-in AI APIs & Gemini Nano</p>
+    </header>      
+
+    <section class="input-panel">
+      <div class="toolbar">
+        <button class="btn btn-secondary" id="summarizeBtn" title="Summarize (Ctrl+S)">
+          <span>Summarize</span>
+        </button>
+        <button class="btn btn-secondary" id="shorternBtn" title="Shortern (Ctrl+X)">
+            <span>Shortern</span>
+          </button>
+        <button class="btn btn-secondary" id="improveBtn" title="Improve (Ctrl+I)">
+          <span>Improve</span>
+        </button>
+        <button class="btn btn-secondary" id="translateBtn" title="Translate (Ctrl+L)">
+          <span>Translate</span>
+        </button>
+        
+        <button class="btn btn-secondary" id="clearBtn" title="Clear (Ctrl+E)">
+          <span>Clear</span>
+        </button>
+          
+      </div>
+
+      <div class="chat-input">
+        <textarea id="inputText" placeholder="Type or speak your message here... (Ctrl+Enter to generate)"></textarea>
+        
+        <div class="input-actions">
+            <button class="btn btn-secondary btn-icon" id="voiceBtn" title="Voice Input (Ctrl+Spacebar)">
+                <span>🎤</span>
+              </button>
+          <div id="recordingStatus"></div>
+          <button class="btn btn-primary" id="generateBtn" title="Generate (Ctrl+Enter)">
+            <span>Generate</span>
+          </button>
+          
+        </div>
+      </div>
+      <div id="inputStatus" class="status"></div>
+      
+      <footer id="footer">
+      </br>
+        <p style="text-align: center; color: white;">&copy; 2024 Abhiram Thimmaraju. All rights reserved. </br> Developed for the <a href="https://googlechromeai.devpost.com/" target="_blank" style="color: white; text-decoration: underline;">Google Chrome Built-in AI Challenge</a></p>
+      </footer>
+      
+    </section>
+    
+
+    <section class="output-panel">
+      <div id="loader" class="loader">
+        <div class="typing">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+      <div id="outputContent" class="output-content"></div>
+      <div id="outputStatus" class="status"></div>
+      <button class="btn btn-secondary" id="stopBtn" style="display: none;">Stop Generation</button>
+    </section>
+  </div>
+
+  <!-- <div class="shortcuts">
+    <div class="shortcut">
+      <span class="key">Ctrl+Enter</span>
+      <span>Generate</span>
+    </div>
+    <div class="shortcut">
+      <span class="key">Ctrl+Spacebar</span>
+      <span>Voice</span>
+    </div>
+    <div class="shortcut">
+      <span class="key">Esc</span>
+      <span>Stop</span>
+    </div>
+    <div class="shortcut">
+        <span class="key">Ctrl+S</span>
+        <span>Summerize</span>
+    </div>
+    <div class="shortcut">
+        <span class="key">Ctrl+X</span>
+        <span>Shortern</span>
+    </div>
+    <div class="shortcut">
+        <span class="key">Ctrl+I</span>
+        <span>Improve</span>
+    </div>
+    <div class="shortcut">
+        <span class="key">Ctrl+L</span>
+        <span>Translate</span>
+    </div>
+    <div class="shortcut">
+        <span class="key">Ctrl+E</span>
+        <span>Clear</span>
+    </div>
+  </div> -->
+  <div class="shortcuts">
+    <div class="shortcut">
+      <span class="key">Ctrl+Enter</span>
+      <span>Generate</span>
+    </div>
+    <div class="shortcut">
+      <span class="key">Ctrl+Spacebar</span>
+      <span>Voice</span>
+    </div>
+    <div class="shortcut">
+      <span class="key">Ctrl+S</span>
+      <span>Summarize</span>
+    </div>
+    <div class="shortcut">
+      <span class="key">Ctrl+X</span>
+      <span>Shorten</span>
+    </div>
+    <div class="shortcut">
+      <span class="key">Ctrl+I</span>
+      <span>Improve</span>
+    </div>
+    <div class="shortcut">
+      <span class="key">Ctrl+L</span>
+      <span>Translate</span>
+    </div>
+    <div class="shortcut">
+      <span class="key">Ctrl+E</span>
+      <span>Clear</span>
+    </div>
+    <div class="shortcut">
+        <span class="key">Ctrl+R</span>
+        <span>Clear&nbsp;&nbsp;Memory</span>
+    </div>
+    <div class="shortcut">
+      <span class="key">Esc</span>
+      <span>Stop</span>
+    </div>
+    
+  </div>
+  
+  
+  
+
+  <script>
+    // Particle Animation
+    class ParticleAnimation {
+      constructor() {
+        this.canvas = document.getElementById('particles');
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.mousePosition = { x: 0, y: 0 };
+        
+        this.resize();
+        this.init();
+        this.animate();
+        
+        window.addEventListener('resize', () => this.resize());
+        document.addEventListener('mousemove', (e) => {
+          this.mousePosition.x = e.clientX;
+          this.mousePosition.y = e.clientY;
+        });
+      }
+      
+      resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      }
+      
+      init() {
+        this.particles = [];
+        for (let i = 0; i < 50; i++) {
+          this.particles.push({
+            x: Math.random() * this.canvas.width,
+            y: Math.random() * this.canvas.height,
+            radius: Math.random() * 2 + 1,
+            vx: Math.random() * 2 - 1,
+            vy: Math.random() * 2 - 1,
+            originalX: Math.random() * this.canvas.width,
+            originalY: Math.random() * this.canvas.height
+          });
+        }
+      }
+      
+      animate() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        this.particles.forEach(particle => {
+          // Move particles
+          particle.x += particle.vx;
+          particle.y += particle.vy;
+          
+          // Bounce off edges
+          if (particle.x < 0 || particle.x > this.canvas.width) particle.vx *= -1;
+          if (particle.y < 0 || particle.y > this.canvas.height) particle.vy *= -1;
+          
+          // Draw particle
+          this.ctx.beginPath();
+          this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+          this.ctx.fillStyle = 'rgba(124, 58, 237, 0.5)';
+          this.ctx.fill();
+          
+          // Draw connections
+          this.particles.forEach(otherParticle => {
+            const dx = particle.x - otherParticle.x;
+            const dy = particle.y - otherParticle.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < 100) {
+              this.ctx.beginPath();
+              this.ctx.strokeStyle = `rgba(124, 58, 237, ${0.2 * (1 - distance / 100)})`;
+              this.ctx.lineWidth = 1;
+              this.ctx.moveTo(particle.x, particle.y);
+              this.ctx.lineTo(otherParticle.x, otherParticle.y);
+              this.ctx.stroke();
+            }
+          });
+        });
+        
+        requestAnimationFrame(() => this.animate());
+      }
+    }
+
+    class AIWorkspace {
+      constructor() {
+        this.aiSession = null;
+        this.isProcessing = false;
+        this.currentStream = null;
+        this.recognition = null;
+        this.isRecording = false;
+
+        this.elements = {
+          input: document.getElementById('inputText'),
+          output: document.getElementById('outputContent'),
+          loader: document.getElementById('loader'),
+          inputStatus: document.getElementById('inputStatus'),
+          outputStatus: document.getElementById('outputStatus'),
+          recordingStatus: document.getElementById('recordingStatus'),
+          stopBtn: document.getElementById('stopBtn'),
+          buttons: {
+            generate: document.getElementById('generateBtn'),
+            summarize: document.getElementById('summarizeBtn'),
+            shortern: document.getElementById('shorternBtn'),
+            improve: document.getElementById('improveBtn'),
+            translate: document.getElementById('translateBtn'),
+            voice: document.getElementById('voiceBtn'),
+            clear: document.getElementById('clearBtn'),
+            stop: document.getElementById('stopBtn')
+          }
+        };
+
+        this.initialize();
+      }
+
+      async initialize() {
+        try {
+          if (!self.ai?.languageModel) {
+            throw new Error("Chrome's AI features are not available. Please enable them in chrome://flags");
+          }
+
+          this.aiSession = await self.ai.languageModel.create({
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1024,
+          });
+
+          this.setupEventListeners();
+          this.setupVoiceRecognition();
+          this.showStatus('success', 'AI Workspace is ready!', 'inputStatus');
+        } catch (error) {
+          this.showStatus('error', error.message, 'inputStatus');
+          this.disableButtons();
+        }
+      }
+
+      setupVoiceRecognition() {
+        if ('webkitSpeechRecognition' in window) {
+          this.recognition = new webkitSpeechRecognition();
+          this.recognition.continuous = true;
+          this.recognition.interimResults = true;
+
+          this.recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+              .map(result => result[0].transcript)
+              .join('');
+            this.elements.input.value = transcript;
+          };
+
+          this.recognition.onend = () => {
+            this.isRecording = false;
+            this.updateRecordingStatus();
+          };
+        } else {
+          this.elements.buttons.voice.style.display = 'none';
+        }
+      }
+
+      updateRecordingStatus() {
+        if (this.isRecording) {
+          this.elements.recordingStatus.innerHTML = '<div class="recording-indicator">🔴 Recording...</div>';
+        } else {
+          this.elements.recordingStatus.innerHTML = '';
+        }
+      }
+
+      setupEventListeners() {
+        // Button clicks
+        this.elements.buttons.generate.addEventListener('click', () => this.handleGenerate());
+        this.elements.buttons.summarize.addEventListener('click', () => this.handleSummarize());
+        this.elements.buttons.shortern.addEventListener('click', () => this.handleShortern());
+        
+        this.elements.buttons.improve.addEventListener('click', () => this.handleImprove());
+        this.elements.buttons.translate.addEventListener('click', () => this.handleTranslate());
+        this.elements.buttons.clear.addEventListener('click', () => this.handleClear());
+        this.elements.buttons.voice.addEventListener('click', () => this.toggleVoiceRecording());
+        this.elements.buttons.stop.addEventListener('click', () => this.stopGeneration());
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+          if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+              return; // Don't prevent default behavior
+          }
+          if (e.ctrlKey && e.key === 'Enter') {
+            e.preventDefault();
+            this.handleGenerate();
+          } else if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            this.handleSummarize();
+          } else if (e.ctrlKey && e.key === 'x') {
+            e.preventDefault();
+            this.handleShortern();
+          } else if (e.ctrlKey && e.key === 'i') {
+            e.preventDefault();
+            this.handleImprove();
+          } else if (e.ctrlKey && e.key === 'l') {
+            e.preventDefault();
+            this.handleTranslate();
+          } else if (e.ctrlKey && e.key === ' ') {
+            e.preventDefault();
+            this.toggleVoiceRecording();
+          } else if (e.ctrlKey && e.key === 'e') {
+            e.preventDefault();
+            this.handleClear();
+          } else if (e.key === 'Escape') {
+            this.stopGeneration();
+          }
+        });
+      }
+
+      toggleVoiceRecording() {
+        if (!this.recognition) return;
+
+        if (this.isRecording) {
+          this.recognition.stop();
+        } else {
+          this.recognition.start();
+          this.isRecording = true;
+          this.updateRecordingStatus();
+        }
+      }
+
+      async handleGenerate() {
+        const prompt = this.elements.input.value.trim();
+        if (!prompt) return;
+
+        await this.processAIRequest(prompt);
+      }
+
+      async handleSummarize() {
+        const text = this.elements.input.value.trim();
+        if (!text) return;
+
+        const prompt = `Please provide a concise summary of the following text:\n\n${text}`;
+        await this.processAIRequest(prompt);
+      }
+
+      async handleShortern() {
+        const text = this.elements.input.value.trim();
+        if (!text) return;
+
+        const prompt = `Please provide a shortened by half of the following text:\n\n${text}`;
+        await this.processAIRequest(prompt);
+      }
+
+      async handleImprove() {
+        const text = this.elements.input.value.trim();
+        if (!text) return;
+
+        const prompt = `Please improve the following text for clarity and professionalism:\n\n${text}`;
+        await this.processAIRequest(prompt);
+      }
+
+      async handleTranslate() {
+        const text = this.elements.input.value.trim();
+        if (!text) return;
+
+        const prompt = `Please translate the following text to English:\n\n${text}`;
+        await this.processAIRequest(prompt);
+      }
+
+      handleClear() {
+        this.elements.input.value = '';
+        this.elements.output.textContent = '';
+        this.elements.inputStatus.textContent = '';
+        this.elements.outputStatus.textContent = '';
+        // Refresh the browser
+        // window.location.reload(); // This will reload the current page
+      }
+
+      stopGeneration() {
+        if (this.currentStream) {
+          this.currentStream.cancel();
+          this.currentStream = null;
+          this.stopProcessing();
+          this.showStatus('success', 'Generation stopped', 'outputStatus');
+        }
+      }
+
+      async processAIRequest(prompt) {
+        if (this.isProcessing) return;
+
+        try {
+          this.startProcessing();
+          const response = await this.generateResponse(prompt);
+          // Convert Markdown to HTML
+    const htmlOutput = marked.parse(response);
+    // Render the HTML content in the output panel
+    this.elements.output.innerHTML = htmlOutput;
+        //   this.showResponse(response);
+          this.showStatus('success', 'Processing complete!', 'outputStatus');
+        } catch (error) {
+          if (error.name !== 'AbortError') {
+            this.showStatus('error', error.message, 'outputStatus');
+          }
+        } finally {
+          this.stopProcessing();
+        }
+      }
+
+      async generateResponse(prompt) {
+        if (!this.aiSession) {
+          throw new Error('AI session not initialized');
+        }
+
+        this.currentStream = await this.aiSession.promptStreaming(prompt);
+        let fullResponse = '';
+
+        try {
+          for await (const chunk of this.currentStream) {
+            fullResponse = chunk.trim();
+            this.updateResponse(fullResponse);
+          }
+        } catch (error) {
+          throw error;
+        } finally {
+          this.currentStream = null;
+        }
+
+        return fullResponse;
+      }
+
+      startProcessing() {
+        this.isProcessing = true;
+        this.elements.loader.classList.add('visible');
+        this.elements.stopBtn.style.display = 'block';
+        this.disableButtons();
+        this.elements.output.textContent = '';
+      }
+
+      stopProcessing() {
+        this.isProcessing = false;
+        this.elements.loader.classList.remove('visible');
+        this.elements.stopBtn.style.display = 'none';
+        this.enableButtons();
+      }
+
+      updateResponse(text) {
+        this.elements.output.textContent = text;
+      }
+
+      showResponse(text) {
+        this.elements.output.textContent = text;
+      }
+
+      showStatus(type, message, elementId) {
+        const element = this.elements[elementId];
+        element.textContent = message;
+        element.className = `status ${type}`;
+      }
+
+      disableButtons() {
+        Object.values(this.elements.buttons).forEach(button => {
+          if (button !== this.elements.buttons.stop) {
+            button.disabled = true;
+          }
+        });
+      }
+
+      enableButtons() {
+        Object.values(this.elements.buttons).forEach(button => {
+          if (button !== this.elements.buttons.stop) {
+            button.disabled = false;
+          }
+        });
+      }
+    }
+
+    // Initialize the AI Workspace and Particle Animation when the page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      new AIWorkspace();
+      new ParticleAnimation();
+    });
+    
+  </script>
+  <script src="./marked.min.js"></script>
+
+
+  
+</body>
+</html>
