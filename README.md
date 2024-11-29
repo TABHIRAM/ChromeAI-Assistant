@@ -5,9 +5,19 @@ This project offers an offline AI assistant using Chrome's Built-in AI APIs and 
 
 ## Prerequisites
 
-1. **Download Chrome Dev Channel (or Canary Channel)**  
+1. **Download Chrome Dev Browser or Chrome Canary Browser**  
    Ensure that your version is **equal to or newer than 128.0.6545.0**.  
-   - Download the Chrome Dev or Canary channel from the [Chrome Dev](https://www.google.com/intl/en_in/chrome/dev/) / [Chrome Canary](https://www.google.com/intl/en_in/chrome/canary/).
+   - Download the Chrome Dev or Chrome Canary from the [Chrome Dev](https://www.google.com/intl/en_in/chrome/dev/) / [Chrome Canary](https://www.google.com/intl/en_in/chrome/canary/).
+## Which One to Prefer: Chrome Dev vs Chrome Canary
+
+| Feature               | **Chrome Dev**                        | **Chrome Canary**                    |
+|-----------------------|---------------------------------------|--------------------------------------|
+| **Update Frequency**   | Weekly updates                       | Daily updates                       |
+| **Stability**          | More stable than Canary, but less stable than Beta | Least stable, frequent crashes       |
+| **Target Audience**    | Developers and early adopters        | Enthusiasts and developers testing the bleeding edge |
+| **Features**           | Latest features, but with more stability than Canary | Cutting-edge, experimental features, can be unstable |
+| **Release Cycle**      | Slightly behind the stable release   | Ahead of Dev, cutting-edge features  |
+| **Recommended For**    | Developers needing new features but require some stability | Developers who want the absolute latest features with more risk |
 
 2. **Check Device Requirements**  
    Confirm that your device meets the following requirements:  
