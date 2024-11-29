@@ -11,7 +11,7 @@ This project offers an offline AI assistant using Chrome's Built-in AI APIs and 
 - **Clear**: Reset the interface for a fresh start.
 - **Voice**: Speak and receive AI-generated responses.
 
-- ## Usage
+## Usage
 Type or speak your message, and use the following hotkeys for actions:
 
 - **Ctrl+Enter**: Generate output
@@ -24,7 +24,7 @@ Type or speak your message, and use the following hotkeys for actions:
 - **Ctrl+R**: Clear memory
 - **Esc**: Stop current operation
 
-- ## Development
+## Development
 Built for the Google Chrome Built-in AI Challenge.
 
 ## License
